@@ -1,0 +1,91 @@
+﻿@model TimeTableViewModel
+
+<h2 class="text-center my-4">Enter Subject Hours</h2>
+
+<div class="container">
+    <form asp-action="GenerateTimeTable" method="post" class="border p-4 rounded shadow-sm bg-light">
+
+        @* Validation Message at the top *@
+        <div id="validationMessage" class="text-danger mb-3 text-center fw-bold"></div>
+
+        @* Hidden Inputs *@
+        <input type="hidden" asp-for="ClassName" />
+        <input type="hidden" asp-for="WorkingDays" />
+        <input type="hidden" asp-for="SubjectsPerDay" />
+        <input type="hidden" asp-for="TotalSubjects" />
+
+        <div class="mb-3">
+            <h4>
+                Total Hours for the Week:
+                <span class="badge bg-info" id="totalHours">
+                    @(Model.WorkingDays * Model.SubjectsPerDay)
+                </span> hours
+            </h4>
+        </div>
+
+        @for (int i = 0; i < Model.TotalSubjects; i++)
+        {
+            <div class="subject-entry mb-3">
+                <label for="SubjectName_@i" class="form-label">Subject Name:</label>
+                <input name="Subjects[@i].SubjectName" type="text" id="SubjectName_@i" class="form-control" placeholder="Enter Subject Name" required />
+
+                <label for="Hours_@i" class="form-label mt-2">Hours:</label>
+                <input name="Subjects[@i].Hours" type="number" id="Hours_@i" class="form-control" required min="1" max="@(Model.WorkingDays * Model.SubjectsPerDay)" placeholder="Enter Hours" />
+            </div>
+        }
+
+        <!-- Buttons -->
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <button type="submit" class="btn btn-primary px-4" id="generateButton" disabled>Generate</button>
+            <a href="@Url.Action("CreateTimeTable", "TimeTable")" class="btn btn-secondary px-4">Back</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            const totalWeeklyHours = @Model.WorkingDays * @Model.SubjectsPerDay;
+
+            function calculateTotalEnteredHours() {
+                let total = 0;
+                $("input[name^='Subjects'][name$='.Hours']").each(function () {
+                    const val = parseInt($(this).val());
+                    if (!isNaN(val)) {
+                        total += val;
+                    }
+                });
+                return total;
+            }
+
+            function validateTotalHours() {
+                const totalEntered = calculateTotalEnteredHours();
+                let message = "";
+
+                if (totalEntered === 0) {
+                    message = "Total hours must match total weekly hours.";
+                } else if (totalEntered < totalWeeklyHours) {
+                    message = "Total entered hours are less than required.";
+                } else if (totalEntered > totalWeeklyHours) {
+                    message = "Total entered hours exceed the allowed limit.";
+                }
+
+                if (totalEntered === totalWeeklyHours) {
+                    $("#generateButton").prop("disabled", false);
+                    $("#validationMessage").text(""); // Clear the message
+                } else {
+                    $("#generateButton").prop("disabled", true);
+                    $("#validationMessage").text(message);
+                }
+            }
+
+
+            $("input[name^='Subjects'][name$='.Hours']").on("input", function () {
+                validateTotalHours();
+            });
+
+            validateTotalHours();
+        });
+    </script>
+}

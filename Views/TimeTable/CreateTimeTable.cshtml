@@ -1,0 +1,78 @@
+﻿@{
+    ViewData["Title"] = "Start Timetable";
+}
+
+<h2 class="text-center my-4">Dynamic Timetable Generator</h2>
+
+<div class="container mt-4">
+    <form id="timeTableForm" asp-action="EnterSubjects" method="post" class="border p-4 rounded shadow-sm bg-light">
+        <div class="mb-3">
+            <label class="form-label" for="className">Class Name:</label>
+            <input type="text" name="className" id="className" class="form-control" placeholder="Enter Class Name" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="workingDays">Working Days:</label>
+            <input type="number" name="workingDays" id="workingDays" class="form-control" placeholder="1 to 7" min="1" max="7" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="subjectsPerDay">Subjects Per Day:</label>
+            <input type="number" name="subjectsPerDay" id="subjectsPerDay" class="form-control" placeholder="Less than 9" min="1" max="8" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="totalSubjects">Total Subjects:</label>
+            <input type="number" name="totalSubjects" id="totalSubjects" class="form-control" placeholder="Enter Total Subjects" min="1" required />
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Next</button>
+    </form>
+</div>
+
+<script>
+    $(document).ready(function () {
+        // Initialize jQuery validation for the form
+        $("#timeTableForm").validate({
+            rules: {
+                className: {
+                    required: true
+                },
+                workingDays: {
+                    required: true,
+                    min: 1,
+                    max: 7
+                },
+                subjectsPerDay: {
+                    required: true,
+                    min: 1,
+                    max: 8
+                },
+                totalSubjects: {
+                    required: true,
+                    min: 1
+                }
+            },
+            messages: {
+                className: "Please enter the class name.",
+                workingDays: {
+                    required: "Please enter working days.",
+                    min: "Working days should be between 1 and 7.",
+                    max: "Working days should be between 1 and 7."
+                },
+                subjectsPerDay: {
+                    required: "Please enter the number of subjects per day.",
+                    min: "Subjects per day should be between 1 and 8.",
+                    max: "Subjects per day should be between 1 and 8."
+                },
+                totalSubjects: {
+                    required: "Please enter the total number of subjects.",
+                    min: "Total subjects should be at least 1."
+                }
+            },
+            submitHandler: function (form) {
+                form.submit(); // Proceed with form submission if valid
+            }
+        });
+    });
+</script>
